@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,10 +50,10 @@ public class MetricsAggregator {
 	private ApplicationMetricsService service;
 
 
-	public MetricsAggregator(ApplicationMetricsService service) {
-		this.service = service;
-		this.mapper = new ObjectMapper();
-	}
+    public MetricsAggregator(ApplicationMetricsService service) {
+        this.service = service;
+        this.mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
 
 	private final static class Metric1TypeReference extends TypeReference<ApplicationMetrics<Metric<Number>>> {}
 
