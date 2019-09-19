@@ -162,9 +162,10 @@ public class ApplicationMetricsService {
 					.toInteger(applicationMetrics.getProperties().get(ApplicationMetrics.INSTANCE_INDEX));
 			instance.setIndex(instanceIndex);
 		}
-
+		
 		instance.setMetrics(applicationMetrics.getMetrics().stream()
-				.filter(metric -> !metric.getName().matches("integration\\.channel\\.(\\w*)\\.send\\.mean"))
+				.filter(metric -> metric.getName() != null && 
+									!metric.getName().matches("integration\\.channel\\.(\\w*)\\.send\\.mean"))
 				.collect(Collectors.toList()));
 
 		instance.setProperties(applicationMetrics.getProperties());
@@ -201,6 +202,8 @@ public class ApplicationMetricsService {
 		List<Metric<Double>> result = new ArrayList<>();
 		ApplicationMetrics<Metric<Double>> applicationMetrics = applicationMetricsList.get(0);
 		for (Metric<Double> metric : applicationMetrics.getMetrics()) {
+			if (metric.getName() == null)
+				continue;
 			Matcher matcher = pattern.matcher(metric.getName());
 			if (matcher.matches()) {
 				Metric previous = applicationMetricsList.size() < 2 ? null
@@ -223,7 +226,7 @@ public class ApplicationMetricsService {
 	}
 
 	private Metric<Double> findMetric(Collection<Metric<Double>> metrics, String name) {
-		Optional<Metric<Double>> optional = metrics.stream().filter(metric -> metric.getName().equals(name)).findFirst();
+		Optional<Metric<Double>> optional = metrics.stream().filter(metric -> metric.getName() != null && metric.getName().equals(name)).findFirst();
 		return optional.isPresent() ? optional.get() : new Metric<>(name, 0.0);
 	}
 }
